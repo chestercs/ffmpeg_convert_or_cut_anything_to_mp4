@@ -2,14 +2,15 @@
 setlocal EnableExtensions EnableDelayedExpansion
 
 REM =========================
-REM 0) Check ffmpeg / optional winget install
+REM 0) Check FFmpeg / optional winget install
 REM =========================
 set "FFMPEG_EXE="
 call :FIND_FFMPEG
 if defined FFMPEG_EXE goto FF_OK
 
 echo.
-echo [!] ffmpeg was not found on this system.
+echo [ERROR] FFmpeg was not found on this system.
+echo.
 set "ans=Y"
 set /p "ans=Install via winget? [Y/N] (Default: Y): "
 if /I "%ans%"=="N" (
@@ -26,7 +27,7 @@ if errorlevel 1 (
 )
 
 echo.
-echo Installing ffmpeg with winget...
+echo Installing FFmpeg with winget...
 winget install --id Gyan.FFmpeg -e --source winget
 if errorlevel 1 (
   echo.
@@ -38,7 +39,7 @@ set "FFMPEG_EXE="
 call :FIND_FFMPEG
 if not defined FFMPEG_EXE (
   echo.
-  echo [!] ffmpeg installed, but PATH did not refresh in this window.
+  echo [!] FFmpeg installed, but PATH did not refresh in this window.
   echo     Close this terminal and rerun the script.
   goto END
 )
@@ -46,12 +47,18 @@ if not defined FFMPEG_EXE (
 :FF_OK
 set "FF=%FFMPEG_EXE%"
 if not defined FF set "FF=ffmpeg"
-echo Using ffmpeg: "%FF%"
+echo [INFO] Using FFmpeg: "%FF%"
 
-REM Resolve ffprobe next to ffmpeg, else from PATH
+REM Resolve ffprobe next to FFmpeg, else from PATH
 set "FFPROBE=ffprobe"
 for %%D in ("%FFMPEG_EXE%") do if exist "%%~dpDffprobe.exe" set "FFPROBE=%%~dpDffprobe.exe"
-echo Using ffprobe: "%FFPROBE%"
+echo [INFO] Using FFprobe: "%FFPROBE%"
+
+echo.
+echo -------------------------------------------------------
+echo    ChesTeRcs - FFmpeg Petyus Vegas Vibe v.0.1.1
+echo -------------------------------------------------------
+
 
 REM =========================
 REM 1) Input file path (any format supported by FFmpeg)
@@ -127,8 +134,8 @@ if not defined dur_sec set "dur_sec=0"
 
 if %dur_sec% LEQ 0 (
   echo.
-  echo [!] Could not read media duration with ffprobe. Cannot safely cut.
-  echo     Check that ffprobe is available and the file is readable.
+  echo [!] Could not read media duration with FFprobe. Cannot safely cut.
+  echo     Check that FFprobe is available and the file is readable.
   if "%DEBUG_PROBE%"=="1" (
     echo DBG> FFPROBE=%FFPROBE%
     echo DBG> infile = %infile%
