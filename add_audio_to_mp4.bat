@@ -55,13 +55,13 @@ REM =========================
 echo.
 echo Reading media durations...
 
-call "%~dp0lib\ffmpeg.bat" :PROBE_DURATION "%videofile%" video_sec video_hms
+call "%~dp0lib\ffmpeg.bat" :GET_DURATION "%videofile%" video_sec video_hms
 if errorlevel 1 (
   echo [!] Could not read VIDEO duration with FFprobe.
   goto END
 )
 
-call "%~dp0lib\ffmpeg.bat" :PROBE_DURATION "%musicfile%" music_sec music_hms
+call "%~dp0lib\ffmpeg.bat" :GET_DURATION "%musicfile%" music_sec music_hms
 if errorlevel 1 (
   echo [!] Could not read MUSIC duration with FFprobe.
   goto END
@@ -84,7 +84,6 @@ set "music_from_ts=%music_from_ts: =%"
 call "%~dp0lib\time.bat" :HMS_TO_SEC "%music_from_ts%" music_from_sec
 if errorlevel 1 echo [Info] Invalid music start format. Use HH:MM:SS; minutes/seconds must be min 00 and max 59.& goto MUSIC_START_LOOP
 
-if %music_from_sec% LSS 0 echo [Info] Music start must be ^>= 00:00:00.& goto MUSIC_START_LOOP
 if %music_from_sec% GEQ %music_sec% echo [Info] Music start is beyond music duration (%music_hms%). Choose an earlier time.& goto MUSIC_START_LOOP
 
 REM =========================
@@ -95,7 +94,7 @@ echo Choose processing mode:
 echo   1) Copy VIDEO + encode new AUDIO  [default]
 echo   2) Re-encode VIDEO + encode AUDIO
 set /p "mode_sel=Select mode (Default: 1): "
-if "%mode_sel%"=="2" ( set "proc_mode=reencode" ) else ( set "proc_mode=copy" & goto ASK_OUTDIR )
+if "%mode_sel:~0,1%"=="2" ( set "proc_mode=reencode" ) else ( set "proc_mode=copy" & goto ASK_OUTDIR )
 
 call "%~dp0lib\ui.bat" :ASK_PRESET_AND_CODEC simple
 call "%~dp0lib\ui.bat" :ASK_GPU_BACKEND "%codec_label%" %vcrf%
@@ -302,7 +301,7 @@ echo Full path: %outfile%
 if /i "%proc_mode%"=="copy" (
   echo Method: copy VIDEO + encode AUDIO
 ) else (
-  echo Method: re-encode VIDEO + encode AUDIO  (codec: %codec_label%; backend: %gpu_mode%)
+  echo Method: re-encode VIDEO + encode AUDIO  ^(codec: %codec_label%; backend: %gpu_mode%^)
 )
 echo Note: original video audio was replaced by the selected music.
 echo       Output length matches the video length.

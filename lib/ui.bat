@@ -3,7 +3,7 @@ if "%~1"=="" goto :EOF
 goto %~1
 
 REM ============================================================
-REM lib\ui.bat  —  shared interactive UI helpers
+REM lib\ui.bat   -   shared interactive UI helpers
 REM
 REM Call convention:
 REM   call "%~dp0lib\ui.bat" :LABEL_NAME  arg2  arg3
@@ -41,9 +41,9 @@ REM ============================================================
 set "x_preset=veryfast"
 echo.
 if /i "%~2"=="simple" (
-  echo Select encoder preset:
+  echo Select encoder preset^:
 ) else (
-  echo Select encoder preset (slower = better compression at the same quality):
+  echo Select encoder preset ^(slower = better compression at the same quality^)^:
 )
 echo   1) ultrafast
 echo   2) superfast
@@ -55,15 +55,15 @@ echo   7) slow
 echo   8) slower
 echo   9) veryslow
 set /p "preset_sel=Select preset (Default: 3): "
-if "%preset_sel%"=="1" set "x_preset=ultrafast"
-if "%preset_sel%"=="2" set "x_preset=superfast"
-if "%preset_sel%"=="3" set "x_preset=veryfast"
-if "%preset_sel%"=="4" set "x_preset=faster"
-if "%preset_sel%"=="5" set "x_preset=fast"
-if "%preset_sel%"=="6" set "x_preset=medium"
-if "%preset_sel%"=="7" set "x_preset=slow"
-if "%preset_sel%"=="8" set "x_preset=slower"
-if "%preset_sel%"=="9" set "x_preset=veryslow"
+if "%preset_sel:~0,1%"=="1" set "x_preset=ultrafast"
+if "%preset_sel:~0,1%"=="2" set "x_preset=superfast"
+if "%preset_sel:~0,1%"=="3" set "x_preset=veryfast"
+if "%preset_sel:~0,1%"=="4" set "x_preset=faster"
+if "%preset_sel:~0,1%"=="5" set "x_preset=fast"
+if "%preset_sel:~0,1%"=="6" set "x_preset=medium"
+if "%preset_sel:~0,1%"=="7" set "x_preset=slow"
+if "%preset_sel:~0,1%"=="8" set "x_preset=slower"
+if "%preset_sel:~0,1%"=="9" set "x_preset=veryslow"
 
 set "vcodec=libx264"
 set "vcrf=20"
@@ -73,7 +73,7 @@ echo Select video codec:
 echo   1) H.264 / AVC (libx264)  [default; widest compatibility]
 echo   2) H.265 / HEVC (libx265)  [smaller files; slower; may be less compatible]
 set /p "codec_sel=Select codec (Default: 1): "
-if not "%codec_sel%"=="2" exit /b 0
+if not "%codec_sel:~0,1%"=="2" exit /b 0
 
 "%FF%" -v error -hide_banner -encoders | findstr /i " libx265 " >nul
 if errorlevel 1 (
@@ -111,7 +111,6 @@ echo (Only the selected backend will be attempted; on failure the script stops.)
 set /p "gpu_choice=Select backend (Default: 1): "
 
 set "gpu_mode=cpu"
-set "enc_video=%vcodec%"
 set "nv_preset=p5"
 set "nv_qp=%vcrf%"
 set "qsv_gq=%vcrf%"
@@ -129,14 +128,14 @@ if "%codec_label%"=="H.265" (
   set "mf_bitrate=4000k"
 )
 
-if "%gpu_choice%"=="2" (
-  if "%codec_label%"=="H.264" ( set "gpu_mode=nvenc" & set "enc_video=h264_nvenc" ) else ( set "gpu_mode=nvenc" & set "enc_video=hevc_nvenc" )
-) else if "%gpu_choice%"=="3" (
-  if "%codec_label%"=="H.264" ( set "gpu_mode=qsv"   & set "enc_video=h264_qsv"  ) else ( set "gpu_mode=qsv"   & set "enc_video=hevc_qsv"  )
-) else if "%gpu_choice%"=="4" (
-  if "%codec_label%"=="H.264" ( set "gpu_mode=amf"   & set "enc_video=h264_amf"  ) else ( set "gpu_mode=amf"   & set "enc_video=hevc_amf"  )
-) else if "%gpu_choice%"=="5" (
-  if "%codec_label%"=="H.264" ( set "gpu_mode=mf"    & set "enc_video=h264_mf"   ) else ( set "gpu_mode=mf"    & set "enc_video=hevc_mf"   )
+if "%gpu_choice:~0,1%"=="2" (
+  set "gpu_mode=nvenc"
+) else if "%gpu_choice:~0,1%"=="3" (
+  set "gpu_mode=qsv"
+) else if "%gpu_choice:~0,1%"=="4" (
+  set "gpu_mode=amf"
+) else if "%gpu_choice:~0,1%"=="5" (
+  set "gpu_mode=mf"
 ) else (
   set "gpu_mode=cpu"
 )
@@ -178,7 +177,7 @@ call "%~dp0ui.bat" :ESCAPE_PATH outfile outfile_esc
 exit /b 0
 
 REM ============================================================
-REM :_GEN_TIMESTAMP  (internal — do not call from outside)
+REM :_GEN_TIMESTAMP  (internal  -  do not call from outside)
 REM   Generates a timestamped basename using wmic, falls back
 REM   to %DATE%/%TIME% string manipulation.
 REM   Sets: basename
@@ -199,7 +198,7 @@ if defined rawts (
 if defined rawts (
   set "ts=!rawts:~0,8!_!rawts:~8,6!_%RANDOM%"
 ) else (
-  REM Fallback: %DATE% %TIME% alapú, ugyanaz mint régen + _RANDOM a végén
+  REM Fallback: %DATE% %TIME% alapu, ugyanaz mint regen + _RANDOM a vegen
   set "ts=%DATE: =0%_%TIME: =0%"
   set "ts=!ts::=!"
   set "ts=!ts:/=!"

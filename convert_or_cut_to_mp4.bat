@@ -44,7 +44,7 @@ echo What do you want to do?
 echo   1) Convert the WHOLE file to MP4   [fast if stream copy]
 echo   2) CUT a segment and make an MP4   [choose times]
 set /p "do_sel=Select action (Default: 1): "
-if "%do_sel%"=="2" ( set "do_cut=yes" ) else ( set "do_cut=no" )
+if "%do_sel:~0,1%"=="2" ( set "do_cut=yes" ) else ( set "do_cut=no" )
 
 if /i "%do_cut%"=="yes" goto DO_PROBE
 goto ASK_MODE
@@ -53,7 +53,7 @@ REM =========================
 REM 2/b) Probe duration (only needed for cut)
 REM =========================
 :DO_PROBE
-call "%~dp0lib\ffmpeg.bat" :PROBE_DURATION "%infile%" dur_sec dur_hms
+call "%~dp0lib\ffmpeg.bat" :GET_DURATION "%infile%" dur_sec dur_hms
 if errorlevel 1 (
   echo.
   echo [!] Could not read media duration with FFprobe. Cannot safely cut.
@@ -82,7 +82,6 @@ if errorlevel 1 echo [Info] Invalid FROM format. Use HH:MM:SS; minutes/seconds m
 call "%~dp0lib\time.bat" :HMS_TO_SEC "%to_ts%" to_sec
 if errorlevel 1 echo [Info] Invalid TO format. Use HH:MM:SS; minutes/seconds must be min 00 and max 59.& goto TIMES_LOOP
 
-if %from_sec% LSS 0      echo [Info] FROM must be ^>= 00:00:00.& goto TIMES_LOOP
 if %from_sec% GEQ %dur_sec% echo [Info] FROM is beyond duration (%dur_hms%). Choose an earlier time.& goto TIMES_LOOP
 if %to_sec%   LEQ %from_sec% echo [Info] TO must be strictly greater than FROM.& goto TIMES_LOOP
 
@@ -109,7 +108,7 @@ echo Choose processing mode:
 echo   1) Stream copy (no re-encode)  - very fast remux to MP4; for cuts it is keyframe-aligned and not frame-accurate
 echo   2) Re-encode                   - slower; frame-accurate cuts; pick codec, preset and GPU
 set /p "mode_sel=Select mode (Default: 1): "
-if "%mode_sel%"=="2" ( set "cutmode=reencode" ) else ( set "cutmode=copy" & goto ASK_OUTDIR )
+if "%mode_sel:~0,1%"=="2" ( set "cutmode=reencode" ) else ( set "cutmode=copy" & goto ASK_OUTDIR )
 
 call "%~dp0lib\ui.bat" :ASK_PRESET_AND_CODEC
 call "%~dp0lib\ui.bat" :ASK_GPU_BACKEND "%codec_label%" %vcrf%
@@ -260,13 +259,13 @@ echo.
 echo [OK] Done.
 echo Full path: %outfile%
 if /i "%cutmode%"=="copy" (
-  echo Method:    stream copy (no re-encode)
+  echo Method:    stream copy ^(no re-encode^)
   if /i "%do_cut%"=="yes" echo Note: the cut is keyframe aligned and may be slightly off.
 ) else (
   if /i "%do_cut%"=="yes" (
-    echo Method:    re-encode segment (codec: %codec_label%; backend: %gpu_mode%)
+    echo Method:    re-encode segment ^(codec: %codec_label%; backend: %gpu_mode%^)
   ) else (
-    echo Method:    re-encode full (codec: %codec_label%; backend: %gpu_mode%)
+    echo Method:    re-encode full ^(codec: %codec_label%; backend: %gpu_mode%^)
   )
 )
 goto END

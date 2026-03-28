@@ -3,7 +3,7 @@ if "%~1"=="" goto :EOF
 goto %~1
 
 REM ============================================================
-REM lib\time.bat  —  time conversion utilities
+REM lib\time.bat   -   time conversion utilities
 REM
 REM Call convention:
 REM   call "%~dp0lib\time.bat" :LABEL_NAME  arg2  arg3
@@ -26,6 +26,9 @@ set "in=!in: =!"
 for /f "tokens=1-3 delims=:" %%a in ("!in!") do (
   set "H=%%a" & set "M=%%b" & set "S=%%c"
 )
+for /f "delims=0123456789" %%Z in ("!H!") do set "H=!H:~0,-1!"
+for /f "delims=0123456789" %%Z in ("!M!") do set "M=!M:~0,-1!"
+for /f "delims=0123456789" %%Z in ("!S!") do set "S=!S:~0,-1!"
 echo.!H!.!M!.!S!| findstr /r "^[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*$" >nul || ( endlocal & exit /b 1 )
 for /f "tokens=* delims=0" %%x in ("!H!") do set "H=%%x"
 for /f "tokens=* delims=0" %%x in ("!M!") do set "M=%%x"
@@ -34,8 +37,6 @@ if "!H!"=="" set "H=0"
 if "!M!"=="" set "M=0"
 if "!S!"=="" set "S=0"
 set /a _H=!H!+0, _M=!M!+0, _S=!S!+0
-if !_M! LSS 0  endlocal & exit /b 1
-if !_S! LSS 0  endlocal & exit /b 1
 if !_M! GEQ 60 endlocal & exit /b 1
 if !_S! GEQ 60 endlocal & exit /b 1
 set /a total=_H*3600 + _M*60 + _S

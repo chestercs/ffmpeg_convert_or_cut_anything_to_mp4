@@ -3,7 +3,7 @@ if "%~1"=="" goto :EOF
 goto %~1
 
 REM ============================================================
-REM lib\ffmpeg.bat  —  FFmpeg discovery, install, duration probe
+REM lib\ffmpeg.bat   -   FFmpeg discovery, install, duration probe
 REM
 REM Call convention:
 REM   call "%~dp0lib\ffmpeg.bat" :LABEL_NAME  arg2  arg3
@@ -13,7 +13,7 @@ REM ============================================================
 REM ============================================================
 REM :FIND_FFMPEG
 REM   Searches for ffmpeg.exe and sets FFMPEG_EXE if found.
-REM   Search order: PATH → WinGet links → WinGet packages → Program Files
+REM   Search order: PATH -> WinGet links -> WinGet packages -> Program Files
 REM   No args.
 REM ============================================================
 :FIND_FFMPEG
@@ -87,7 +87,6 @@ if not defined FFMPEG_EXE (
 
 :_EF_OK
 set "FF=%FFMPEG_EXE%"
-if not defined FF set "FF=ffmpeg"
 echo [INFO] Using FFmpeg: "%FF%"
 set "FFPROBE=ffprobe"
 for %%D in ("%FFMPEG_EXE%") do if exist "%%~dpDffprobe.exe" set "FFPROBE=%%~dpDffprobe.exe"
@@ -95,7 +94,7 @@ echo [INFO] Using FFprobe: "%FFPROBE%"
 exit /b 0
 
 REM ============================================================
-REM :PROBE_DURATION
+REM GET_DURATION
 REM   Reads media file duration via ffprobe.
 REM   Requires FF and FFPROBE to be set (call :ENSURE_FFMPEG first).
 REM   %2 = file path
@@ -103,7 +102,7 @@ REM   %3 = output variable name for integer seconds
 REM   %4 = output variable name for HH:MM:SS string
 REM   errorlevel 1 if duration cannot be determined
 REM ============================================================
-:PROBE_DURATION
+:GET_DURATION
 setlocal EnableExtensions DisableDelayedExpansion
 set "probe_file=%~2"
 set "dur_raw="

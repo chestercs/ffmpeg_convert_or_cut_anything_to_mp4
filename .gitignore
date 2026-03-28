@@ -15,3 +15,7 @@ $RECYCLE.BIN/
 
 # Temp files created by scripts
 *.tmp
+
+# Test runner generated files
+tests/assets/
+tests/tmp_output/
