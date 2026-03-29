@@ -17,7 +17,7 @@ REM =========================
 REM 1) Input video file
 REM =========================
 call "%~dp0lib\draw.bat" :SECTION "VIDEO FILE"
-echo   %_CY%Enter full path to the VIDEO file%_C0%
+echo   %_CY%Enter full path to the VIDEO file%_C0%  %_CGr%(or drag ^& drop it here)%_C0%
 set /p "videofile="
 if "%videofile%"=="" (
   echo.
@@ -36,7 +36,7 @@ REM =========================
 REM 2) Input music file
 REM =========================
 call "%~dp0lib\draw.bat" :SECTION "MUSIC FILE"
-echo   %_CY%Enter full path to the MUSIC file%_C0%
+echo   %_CY%Enter full path to the MUSIC file%_C0%  %_CGr%(or drag ^& drop it here)%_C0%
 set /p "musicfile="
 if "%musicfile%"=="" (
   echo.

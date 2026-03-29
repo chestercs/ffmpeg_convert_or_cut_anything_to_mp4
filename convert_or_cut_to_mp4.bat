@@ -14,7 +14,7 @@ REM =========================
 REM 1) Input file
 REM =========================
 call "%~dp0lib\draw.bat" :SECTION "INPUT FILE"
-echo   %_CY%Enter full path to the media file%_C0%
+echo   %_CY%Enter full path to the media file%_C0%  %_CGr%(or drag ^& drop it here)%_C0%
 set /p "infile="
 if "%infile%"=="" (
   echo.
