@@ -1,0 +1,8 @@
+# Batch files MUST have CRLF - CMD label scanner breaks with LF-only
+*.bat   text eol=crlf
+
+# Shell scripts use LF
+*.sh    text eol=lf
+
+# Everything else: normalize to LF in repo, checkout as-is
+*       text=auto

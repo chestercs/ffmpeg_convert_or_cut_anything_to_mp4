@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Automated test runner for ChesTeRcs FFmpeg scripts.
+# Automated test runner for ChesTeRcs VegasVibe FFmpeg scripts.
 # Input files use CRLF (printf '\r\n') — required by Windows CMD set /p.
 # Requires: bash (Git for Windows), ffmpeg/ffprobe in PATH or WinGet packages.
 
@@ -14,7 +14,7 @@ mkdir -p "$ASSETS_DIR" "$OUT_DIR"
 
 echo
 echo "==================================================="
-echo "  ChesTeRcs - Automated Test Suite"
+echo "  ChesTeRcs VegasVibe - Automated Test Suite"
 echo "==================================================="
 echo
 

@@ -9,7 +9,7 @@ set "FAIL=0"
 
 echo.
 echo ===================================================
-echo   ChesTeRcs - Automated Test Suite
+echo   ChesTeRcs VegasVibe - Automated Test Suite
 echo ===================================================
 echo.
 

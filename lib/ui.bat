@@ -11,7 +11,7 @@ REM   actual args start at %2
 REM ============================================================
 
 REM ============================================================
-REM :ESCAPE_PATH
+REM ESCAPE_PATH
 REM   Reads the value of a named variable, escapes CMD special
 REM   characters (^ & | < > ( )) and stores the result.
 REM   %2 = input variable name  (e.g. infile)
@@ -31,30 +31,33 @@ set "_ep="
 exit /b 0
 
 REM ============================================================
-REM :ASK_PRESET_AND_CODEC
+REM ASK_PRESET_AND_CODEC
 REM   Prompts for encoder preset and video codec.
 REM   Requires FF to be set.
-REM   No args.
+REM   %2 = "simple" -> shorter header (used by add_audio_to_mp4)
 REM   Sets: x_preset, vcodec, vcrf, codec_label
 REM ============================================================
 :ASK_PRESET_AND_CODEC
 set "x_preset=veryfast"
-echo.
+call "%~dp0draw.bat" :SECTION "ENCODER PRESET"
 if /i "%~2"=="simple" (
-  echo Select encoder preset^:
+  echo   %_CGr%Select how hard the encoder works ^(slower = smaller file, same quality^)%_C0%
 ) else (
-  echo Select encoder preset ^(slower = better compression at the same quality^)^:
+  echo   %_CGr%Select encoder preset ^(slower = better compression at the same quality^)%_C0%
 )
-echo   1) ultrafast
-echo   2) superfast
-echo   3) veryfast   [default]
-echo   4) faster
-echo   5) fast
-echo   6) medium
-echo   7) slow
-echo   8) slower
-echo   9) veryslow
-set /p "preset_sel=Select preset (Default: 3): "
+echo.
+call "%~dp0draw.bat" :MENUITEM "1" "ultrafast"
+call "%~dp0draw.bat" :MENUITEM "2" "superfast"
+call "%~dp0draw.bat" :MENUITEM "3" "veryfast " "(default)"
+call "%~dp0draw.bat" :MENUITEM "4" "faster   "
+call "%~dp0draw.bat" :MENUITEM "5" "fast     "
+call "%~dp0draw.bat" :MENUITEM "6" "medium   "
+call "%~dp0draw.bat" :MENUITEM "7" "slow     "
+call "%~dp0draw.bat" :MENUITEM "8" "slower   "
+call "%~dp0draw.bat" :MENUITEM "9" "veryslow "
+echo.
+echo   %_CY%Select preset [1-9, default: 3]%_C0%
+set /p "preset_sel="
 if "%preset_sel:~0,1%"=="1" set "x_preset=ultrafast"
 if "%preset_sel:~0,1%"=="2" set "x_preset=superfast"
 if "%preset_sel:~0,1%"=="3" set "x_preset=veryfast"
@@ -68,17 +71,18 @@ if "%preset_sel:~0,1%"=="9" set "x_preset=veryslow"
 set "vcodec=libx264"
 set "vcrf=20"
 set "codec_label=H.264"
+call "%~dp0draw.bat" :SECTION "VIDEO CODEC"
+call "%~dp0draw.bat" :MENUITEM "1" "H.264 / AVC  ^(libx264^)" "(default; widest compatibility)"
+call "%~dp0draw.bat" :MENUITEM "2" "H.265 / HEVC ^(libx265^)" "(smaller files; slower; less compatible)"
 echo.
-echo Select video codec:
-echo   1) H.264 / AVC (libx264)  [default; widest compatibility]
-echo   2) H.265 / HEVC (libx265)  [smaller files; slower; may be less compatible]
-set /p "codec_sel=Select codec (Default: 1): "
+echo   %_CY%Select codec [1-2, default: 1]%_C0%
+set /p "codec_sel="
 if not "%codec_sel:~0,1%"=="2" exit /b 0
 
 "%FF%" -v error -hide_banner -encoders | findstr /i " libx265 " >nul
 if errorlevel 1 (
   echo.
-  echo [!] libx265 encoder not found. Using H.264 instead.
+  echo   %_CY%[!]%_C0%  libx265 not found in this FFmpeg build. Using H.264 instead.
   exit /b 0
 )
 set "vcodec=libx265"
@@ -87,7 +91,7 @@ set "codec_label=H.265"
 exit /b 0
 
 REM ============================================================
-REM :ASK_GPU_BACKEND
+REM ASK_GPU_BACKEND
 REM   Prompts for GPU/CPU encoder backend and sets encoder vars.
 REM   %2 = codec_label  (H.264 or H.265)
 REM   %3 = vcrf         (base quality value)
@@ -100,15 +104,17 @@ set "vcrf=%~3"
 set "vcodec=libx264"
 if "%codec_label%"=="H.265" set "vcodec=libx265"
 
+call "%~dp0draw.bat" :SECTION "ENCODER BACKEND"
+call "%~dp0draw.bat" :MENUITEM "1" "CPU  ^(%codec_label% / %vcodec%^)" "(default)"
+call "%~dp0draw.bat" :MENUITEM "2" "NVIDIA NVENC"
+call "%~dp0draw.bat" :MENUITEM "3" "Intel Quick Sync"
+call "%~dp0draw.bat" :MENUITEM "4" "AMD AMF"
+call "%~dp0draw.bat" :MENUITEM "5" "MediaFoundation"
 echo.
-echo Select encoder backend (GPU or CPU):
-echo   1) CPU  - %codec_label% (%vcodec%)  [default]
-echo   2) NVIDIA NVENC
-echo   3) Intel Quick Sync
-echo   4) AMD AMF
-echo   5) MediaFoundation
-echo (Only the selected backend will be attempted; on failure the script stops.)
-set /p "gpu_choice=Select backend (Default: 1): "
+echo   %_CGr%Only the selected backend is attempted; on failure the script stops.%_C0%
+echo.
+echo   %_CY%Select backend [1-5, default: 1]%_C0%
+set /p "gpu_choice="
 
 set "gpu_mode=cpu"
 set "nv_preset=p5"
@@ -142,30 +148,33 @@ if "%gpu_choice:~0,1%"=="2" (
 exit /b 0
 
 REM ============================================================
-REM :ASK_OUTPUT
+REM ASK_OUTPUT
 REM   Prompts for output directory and filename.
-REM   No args.
 REM   Sets: outdir, basename, outfile, outfile_esc
 REM   errorlevel 1 if output directory cannot be created
 REM ============================================================
 :ASK_OUTPUT
 set "default_outdir=%USERPROFILE%\Downloads"
-echo.
-set /p "outdir=Output directory (Default: %default_outdir%): "
+call "%~dp0draw.bat" :SECTION "OUTPUT"
+echo   %_CY%Output directory [default: %default_outdir%]%_C0%
+set /p "outdir="
 if "%outdir%"=="" set "outdir=%default_outdir%"
 for %%A in ("%outdir%") do set "outdir=%%~A"
 if not exist "%outdir%" (
-  echo Creating directory: %outdir%
+  echo   %_CGr%Creating directory: %outdir%%_C0%
   mkdir "%outdir%" >nul 2>&1
   if errorlevel 1 (
-    echo [!] Failed to create output directory.
+    echo.
+    echo   %_CR%[!]  Failed to create output directory.%_C0%
     exit /b 1
   )
 )
 
 echo.
-echo Example filename: output_01   (do NOT type .mp4)
-set /p "basename=Output filename (Default: auto timestamp): "
+echo   %_CGr%Filename without .mp4 extension. Leave blank for auto timestamp.%_C0%
+echo.
+echo   %_CY%Output filename [no .mp4, default: auto timestamp]%_C0%
+set /p "basename="
 for %%A in ("%basename%") do set "basename=%%~A"
 
 if "%basename%"=="" call :_GEN_TIMESTAMP
@@ -177,10 +186,8 @@ call "%~dp0ui.bat" :ESCAPE_PATH outfile outfile_esc
 exit /b 0
 
 REM ============================================================
-REM :_GEN_TIMESTAMP  (internal  -  do not call from outside)
-REM   Generates a timestamped basename using wmic, falls back
-REM   to %DATE%/%TIME% string manipulation.
-REM   Sets: basename
+REM _GEN_TIMESTAMP  (internal)
+REM   Generates a timestamped basename. Sets: basename
 REM ============================================================
 :_GEN_TIMESTAMP
 setlocal EnableDelayedExpansion
@@ -190,7 +197,6 @@ set "_tmpts=%TEMP%\ts_%RANDOM%_%RANDOM%.txt"
 wmic os get LocalDateTime /value >"%_tmpts%" 2>nul
 for /f "usebackq tokens=2 delims==." %%I in ("%_tmpts%") do if not "%%I"=="" set "rawts=%%I"
 if exist "%_tmpts%" del /q "%_tmpts%" >nul 2>&1
-REM validate: rawts must be at least 14 pure digits (YYYYMMDDHHmmss...)
 if defined rawts (
   set "_chk=!rawts:~0,14!"
   for /f "delims=0123456789" %%Z in ("!_chk!") do set "rawts="
@@ -198,7 +204,6 @@ if defined rawts (
 if defined rawts (
   set "ts=!rawts:~0,8!_!rawts:~8,6!_%RANDOM%"
 ) else (
-  REM Fallback: %DATE% %TIME% alapu, ugyanaz mint regen + _RANDOM a vegen
   set "ts=%DATE: =0%_%TIME: =0%"
   set "ts=!ts::=!"
   set "ts=!ts:/=!"
