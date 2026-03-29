@@ -19,6 +19,7 @@ REM =========================
 call "%~dp0lib\draw.bat" :SECTION "VIDEO FILE"
 echo   %_CY%Enter full path to the VIDEO file%_C0%  %_CGr%(or drag ^& drop it here)%_C0%
 set /p "videofile="
+set "videofile=%videofile:"=%"
 if "%videofile%"=="" (
   echo.
   echo %_CR%  [!]  Video path cannot be empty.%_C0%
@@ -38,6 +39,7 @@ REM =========================
 call "%~dp0lib\draw.bat" :SECTION "MUSIC FILE"
 echo   %_CY%Enter full path to the MUSIC file%_C0%  %_CGr%(or drag ^& drop it here)%_C0%
 set /p "musicfile="
+set "musicfile=%musicfile:"=%"
 if "%musicfile%"=="" (
   echo.
   echo %_CR%  [!]  Music path cannot be empty.%_C0%
